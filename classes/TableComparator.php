@@ -44,11 +44,14 @@ class TableComparator {
         }
     }
 
-    public function compareTableStructure($table_name) {
-        $columns1 = $this->db->getTableColumns($this->db1_name, $table_name);
-        $columns2 = $this->db->getTableColumns($this->db2_name, $table_name);
-        $indexes1 = $this->db->getTableIndexes($this->db1_name, $table_name);
-        $indexes2 = $this->db->getTableIndexes($this->db2_name, $table_name);
+    public function compareTableStructure($table1, $table2 = null) {
+        // If no specific table2 provided, use same name from db2
+        $compare_with = $table2 ?? $table1;
+        
+        $columns1 = $this->db->getTableColumns($this->db1_name, $table1);
+        $columns2 = $this->db->getTableColumns($this->db2_name, $compare_with);
+        $indexes1 = $this->db->getTableIndexes($this->db1_name, $table1);
+        $indexes2 = $this->db->getTableIndexes($this->db2_name, $compare_with);
 
         $cols1 = array_column($columns1, null, 'COLUMN_NAME');
         $cols2 = array_column($columns2, null, 'COLUMN_NAME');
@@ -69,8 +72,8 @@ class TableComparator {
         ];
     }
 
-    public function getTableDifferences($table_name) {
-        $comparison = $this->compareTableStructure($table_name);
+    public function getTableDifferences($table1, $table2 = null) {
+        $comparison = $this->compareTableStructure($table1, $table2);
         $diffs = [
             'columns_missing' => [],
             'type_mismatches' => [],

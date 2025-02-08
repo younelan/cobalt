@@ -44,23 +44,32 @@ $(document).ready(function() {
     if (storedDb2) $('#db2').val(storedDb2);
 
     function initializeComparison() {
-        $('#select-all').change(function() {
+        // Remove all existing event handlers and rebind
+        $(document).off('change', '#select-all, .compare-with');
+        $(document).off('click', '.compare-details');
+
+        // Handle select all
+        $(document).on('change', '#select-all', function() {
             $('.table-select').prop('checked', $(this).prop('checked'));
         });
 
-        $('.compare-with').change(function() {
-            const tableEntry = $(this).closest('.table-entry');
-            const originalTable = tableEntry.data('table');
+        // Handle table comparison dropdown
+        $(document).on('change', '.compare-with', function() {
+            const tableRow = $(this).closest('.table-entry');
+            const originalTable = tableRow.data('table');  // Get the original table name
             const compareWith = $(this).val();
-            
+
+            if (!compareWith) return;
+
             $.ajax({
                 url: 'ajax/compare_single_table.php',
                 method: 'POST',
                 data: {
                     db1: $('#db1').val(),
                     db2: $('#db2').val(),
-                    table1: originalTable,
-                    table2: compareWith
+                    table1: originalTable,      // Use the original table name
+                    table2: compareWith,        // Use the selected comparison table
+                    selected: compareWith       // Keep track of selected value
                 },
                 success: function(response) {
                     try {
@@ -69,28 +78,25 @@ $(document).ready(function() {
                             alert(result.error);
                             return;
                         }
-                        if (result.html) {
-                            tableEntry.replaceWith(result.html);
-                            initializeComparison(); // Reinitialize events
-                        }
+                        // Replace the table row with the new comparison
+                        const newRow = $(result.html);
+                        tableRow.replaceWith(newRow);
+                        // Make sure the dropdown keeps the selected value
+                        newRow.find('.compare-with').val(compareWith);
                     } catch(e) {
                         console.error('Error parsing response:', e);
                         alert('Error updating comparison');
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX error:', error);
-                    alert('Error updating comparison');
                 }
             });
         });
 
-        $('.compare-details').click(function() {
-            const tableEntry = $(this).closest('.table-entry');
-            const table = tableEntry.data('table');
-            const compareWith = tableEntry.find('.compare-with').val();
-            // Table details functionality will be implemented later
-            alert('Details for table: ' + table + ' compared with: ' + compareWith);
+        // Handle details button
+        $(document).on('click', '.compare-details', function() {
+            const tableRow = $(this).closest('.table-entry');
+            const table = tableRow.attr('id').replace('table-row-', '');
+            const compareWith = tableRow.find('.compare-with').val();
+            alert('Details for ' + table + ' compared with ' + compareWith);
         });
     }
 

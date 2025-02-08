@@ -57,21 +57,38 @@ try {
                 <div class="text-warning">Structure Mismatches: ' . implode(', ', $comparator->getStructureMismatches()) . '</div>
             </div>';
 
+    // Pre-generate dropdown options for all tables in DB2
+    $allTableOptions = '';
+    foreach ($comparator->getTables2() as $compare_table) {
+        $compare_name = $compare_table['TABLE_NAME'];
+        $allTableOptions .= sprintf(
+            '<option value="%s">%s</option>',
+            htmlspecialchars($compare_name),
+            htmlspecialchars($compare_name)
+        );
+    }
+
     foreach ($comparator->getTables1() as $table) {
         $table_name = $table['TABLE_NAME'];
         $exists_in_db2 = $comparator->tableExistsInDb2($table_name);
         
-        // Create dropdown for table comparison
+        // Create dropdown with appropriate options
         $table_select = '<select class="form-select form-select-sm compare-with" style="width: auto; display: inline-block; margin-left: 10px;">';
-        foreach ($comparator->getTables2() as $compare_table) {
-            $compare_name = $compare_table['TABLE_NAME'];
-            $selected = ($compare_name === $table_name) ? 'selected' : '';
-            $table_select .= sprintf(
-                '<option value="%s" %s>%s</option>',
-                htmlspecialchars($compare_name),
-                $selected,
-                htmlspecialchars($compare_name)
-            );
+        if ($exists_in_db2) {
+            // Create dropdown with current table selected
+            foreach ($comparator->getTables2() as $compare_table) {
+                $compare_name = $compare_table['TABLE_NAME'];
+                $selected = ($compare_name === $table_name) ? 'selected' : '';
+                $table_select .= sprintf(
+                    '<option value="%s" %s>%s</option>',
+                    htmlspecialchars($compare_name),
+                    $selected,
+                    htmlspecialchars($compare_name)
+                );
+            }
+        } else {
+            // For missing tables, show empty default option plus all available tables
+            $table_select .= '<option value="">Select table</option>' . $allTableOptions;
         }
         $table_select .= '</select>';
 
@@ -149,24 +166,27 @@ try {
         }
 
         $output .= sprintf(
-            '<div class="table-entry border-bottom table-diff %s" data-table="%s">
+            '<div id="table-row-%s" class="table-entry border-bottom table-diff %s" data-table="%s">
                 <div class="row p-2 align-items-center">
                     <div class="col-auto"><input type="checkbox" class="form-check-input table-select me-2"></div>
                     <div class="col">
                         <span class="h6 mb-0">%s</span>
-                        <span class="text-muted">compare with</span>%s
+                        <span class="text-muted">compare with</span>
+                        %s
                         <span class="badge %s status-badge ms-2">%s</span>
-                        <button class="btn btn-sm btn-primary float-end compare-details">Details</button>
+                        <button class="btn btn-sm btn-primary float-end compare-details" data-table="%s">Details</button>
                     </div>
                 </div>
-                %s
+                <div class="comparison-details">%s</div>
             </div>',
-            $statusClass,
             htmlspecialchars($table_name),
+            $statusClass,
+            htmlspecialchars($table_name),  // Added data-table attribute
             htmlspecialchars($table_name),
             $table_select,
             $statusBadgeClass,
             htmlspecialchars($statusText),
+            htmlspecialchars($table_name),  // Added data-table to button
             $details
         );
     }
