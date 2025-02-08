@@ -48,10 +48,49 @@ $(document).ready(function() {
             $('.table-select').prop('checked', $(this).prop('checked'));
         });
 
+        $('.compare-with').change(function() {
+            const tableEntry = $(this).closest('.table-entry');
+            const originalTable = tableEntry.data('table');
+            const compareWith = $(this).val();
+            
+            $.ajax({
+                url: 'ajax/compare_single_table.php',
+                method: 'POST',
+                data: {
+                    db1: $('#db1').val(),
+                    db2: $('#db2').val(),
+                    table1: originalTable,
+                    table2: compareWith
+                },
+                success: function(response) {
+                    try {
+                        const result = JSON.parse(response);
+                        if (result.error) {
+                            alert(result.error);
+                            return;
+                        }
+                        if (result.html) {
+                            tableEntry.replaceWith(result.html);
+                            initializeComparison(); // Reinitialize events
+                        }
+                    } catch(e) {
+                        console.error('Error parsing response:', e);
+                        alert('Error updating comparison');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    alert('Error updating comparison');
+                }
+            });
+        });
+
         $('.compare-details').click(function() {
-            const table = $(this).data('table');
+            const tableEntry = $(this).closest('.table-entry');
+            const table = tableEntry.data('table');
+            const compareWith = tableEntry.find('.compare-with').val();
             // Table details functionality will be implemented later
-            alert('Details for table: ' + table);
+            alert('Details for table: ' + table + ' compared with: ' + compareWith);
         });
     }
 

@@ -64,6 +64,57 @@ $selected = $session->getSelectedDatabases();
             border-radius: 4px;
             margin-top: 0.5em;
         }
+        .diff-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+        .diff-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85em;
+            background: #f8f9fa;
+        }
+        .diff-item.missing { background: #f8d7da; color: #721c24; }
+        .diff-item.mismatch { background: #fff3cd; color: #856404; }
+        .diff-item.index { background: #cce5ff; color: #004085; }
+        .diff-item strong { margin-right: 0.35rem; }
+        .diff-arrow { color: #6c757d; margin: 0 0.35rem; font-size: 0.9em; }
+        .diff-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .diff-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .diff-title {
+            font-weight: 600;
+            color: #495057;
+            min-width: 100px;
+        }
+        .diff-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.85rem;
+            border-radius: 1rem;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        .diff-item.missing { background: #f8d7da; color: #721c24; }
+        .diff-item.mismatch { background: #fff3cd; color: #856404; }
+        .diff-items-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex: 1;
+        }
     </style>
 </head>
 <body class="bg-light">

@@ -61,6 +61,20 @@ try {
         $table_name = $table['TABLE_NAME'];
         $exists_in_db2 = $comparator->tableExistsInDb2($table_name);
         
+        // Create dropdown for table comparison
+        $table_select = '<select class="form-select form-select-sm compare-with" style="width: auto; display: inline-block; margin-left: 10px;">';
+        foreach ($comparator->getTables2() as $compare_table) {
+            $compare_name = $compare_table['TABLE_NAME'];
+            $selected = ($compare_name === $table_name) ? 'selected' : '';
+            $table_select .= sprintf(
+                '<option value="%s" %s>%s</option>',
+                htmlspecialchars($compare_name),
+                $selected,
+                htmlspecialchars($compare_name)
+            );
+        }
+        $table_select .= '</select>';
+
         if ($exists_in_db2) {
             $comparison = $comparator->compareTableStructure($table_name);
             $differences = $comparator->getTableDifferences($table_name);
@@ -82,42 +96,77 @@ try {
         
         $details = '';
         if ($exists_in_db2 && !empty($differences)) {
-            $diffLines = [];
+            // Group differences by type
+            $missingDiffs = [];
+            $typeDiffs = [];
+            $indexDiffs = [];
+
             foreach ($differences as $diff) {
-                $diffLines[] = sprintf(
-                    '<span class="diff-label %s">%s</span>%s',
-                    htmlspecialchars($diff['class']),
-                    htmlspecialchars($diff['label']),
-                    htmlspecialchars($diff['content'])
-                );
+                switch ($diff['class']) {
+                    case 'diff-missing':
+                        $missingDiffs[] = sprintf(
+                            '<span class="diff-item missing">%s: %s</span>',
+                            htmlspecialchars($diff['label']),
+                            htmlspecialchars($diff['content'])
+                        );
+                        break;
+                    case 'diff-type':
+                        $field = substr($diff['content'], 0, strpos($diff['content'], ':'));
+                        $types = explode(' → ', substr($diff['content'], strpos($diff['content'], ':') + 2));
+                        $typeDiffs[] = sprintf(
+                            '<span class="diff-item mismatch"><strong>%s:</strong> %s<span class="diff-arrow">→</span>%s</span>',
+                            htmlspecialchars($field),
+                            htmlspecialchars($types[0]),
+                            htmlspecialchars($types[1])
+                        );
+                        break;
+                    case 'diff-index':
+                        $indexDiffs[] = sprintf(
+                            '<span class="diff-item index">%s: %s</span>',
+                            htmlspecialchars($diff['label']),
+                            htmlspecialchars($diff['content'])
+                        );
+                        break;
+                }
             }
-            $details = '<div class="px-4 pb-2"><div class="text-muted">' . 
-                      implode(' | ', $diffLines) . 
-                      '</div></div>';
+
+            $details = '<div class="diff-summary px-4 pb-2">';
+            if (!empty($missingDiffs)) {
+                $details .= '<div class="diff-line">
+                    <div class="diff-items-wrapper">' . implode('', $missingDiffs) . '</div>
+                </div>';
+            }
+            if (!empty($typeDiffs)) {
+                $details .= '<div class="diff-line">
+                    <span class="diff-title">Mismatches:</span>
+                    <div class="diff-items-wrapper">' . implode('', $typeDiffs) . '</div>
+                </div>';
+            }
+            if (!empty($indexDiffs)) {
+                $details .= '<div class="diff-line">' . implode('', $indexDiffs) . '</div>';
+            }
+            $details .= '</div>';
         }
 
         $output .= sprintf(
-            '<div class="table-entry border-bottom table-diff %s">
+            '<div class="table-entry border-bottom table-diff %s" data-table="%s">
                 <div class="row p-2 align-items-center">
                     <div class="col-auto"><input type="checkbox" class="form-check-input table-select me-2"></div>
                     <div class="col">
                         <span class="h6 mb-0">%s</span>
+                        <span class="text-muted">compare with</span>%s
                         <span class="badge %s status-badge ms-2">%s</span>
-                        <button class="btn btn-sm btn-primary float-end compare-details" 
-                                data-table="%s" 
-                                data-db1="%s" 
-                                data-db2="%s">Details</button>
+                        <button class="btn btn-sm btn-primary float-end compare-details">Details</button>
                     </div>
                 </div>
                 %s
             </div>',
             $statusClass,
             htmlspecialchars($table_name),
+            htmlspecialchars($table_name),
+            $table_select,
             $statusBadgeClass,
             htmlspecialchars($statusText),
-            htmlspecialchars($table_name),
-            htmlspecialchars($_POST['db1']),
-            htmlspecialchars($_POST['db2']),
             $details
         );
     }
