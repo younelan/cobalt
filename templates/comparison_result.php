@@ -49,7 +49,18 @@ try {
         $indexes2 = $pdo2->query("SHOW INDEXES FROM `$table`")->fetchAll(PDO::FETCH_ASSOC);
         
         echo "<div class='card mb-4'>";
-        echo "<div class='card-header'><h3 class='mb-0'>Table: {$table}</h3></div>";
+        echo "<div class='card-header d-flex justify-content-between align-items-center'>";
+        echo "<h3 class='mb-0'>Table: {$table}</h3>";
+        echo "<div class='compare-with-dropdown'>";
+        echo "<select class='form-select form-select-sm alternate-table' data-original-table='{$table}'>";
+        echo "<option value='{$table}'>Compare with same table</option>";
+        foreach ($selected_tables2 as $otherTable) {
+            if ($otherTable !== $table) {
+                echo "<option value='{$otherTable}'>Compare with {$otherTable}</option>";
+            }
+        }
+        echo "</select></div></div>";
+        
         echo "<div class='card-body'>";
         
         // Column Comparison

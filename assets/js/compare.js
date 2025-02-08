@@ -61,7 +61,7 @@ function formatDifference(type, fields, dbContext = '') {
     return `<div class="difference-item">
         <span class="keyword">${type}</span>
         <span class="field-list">${Array.isArray(fields) ? fields.join(', ') : fields}</span>
-        ${dbContext ? `<span class="db-context">${dbContext}</span>` : ''}
+        <span class="db-context">${dbContext}</span>
     </div>`;
 }
 
@@ -196,6 +196,43 @@ function highlightMissingTables() {
         });
 }
 
+function updateComparisonView(table1, table2) {
+    // Add AJAX call to get comparison data for specific tables
+    fetch(`ajax/compare_specific_tables.php?db1=${db1}&db2=${db2}&table1=${table1}&table2=${table2}`)
+        .then(handleFetchError)
+        .then(response => response.json())
+        .then(data => {
+            const diffDiv = document.getElementById(`${table1}-diff`);
+            if (!diffDiv) return;
+
+            let html = '';
+            if (data.identicalStructure) {
+                html = '<div class="identical-notice">✓ Identical structure</div>';
+            } else {
+                if (data.missingInDb2.length) {
+                    html += formatDifference('Missing in DB2', data.missingInDb2, 'Only in ' + db1);
+                }
+                if (data.missingInDb1.length) {
+                    html += formatDifference('Missing in DB1', data.missingInDb1, 'Only in ' + db2);
+                }
+                if (data.typeMismatches.length) {
+                    html += `<div class="type-mismatch">
+                        <span class="difference-label">Type differences:</span>
+                        ${data.typeMismatches.map(tm => `
+                            <div class="type-mismatch-item">
+                                <span class="field-name">${tm.field}</span>
+                                <span class="db-context">DB1: ${tm.db1Type}</span>
+                                <span class="type-arrow">→</span>
+                                <span class="db-context">DB2: ${tm.db2Type}</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+            }
+            diffDiv.innerHTML = html;
+        });
+}
+
 function handleSelectAll(target, select) {
     document.querySelectorAll(`#tables${target} input[type="checkbox"]`).forEach(checkbox => {
         if (!checkbox.closest('label')?.classList.contains('text-danger')) {
@@ -254,4 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Form is valid, let it submit normally
     });
+});
+
+// Add event listener for table comparison dropdown
+document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('alternate-table')) {
+        const originalTable = e.target.dataset.originalTable;
+        const compareWithTable = e.target.value;
+        updateComparisonView(originalTable, compareWithTable);
+    }
 });

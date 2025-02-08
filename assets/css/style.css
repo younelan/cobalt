@@ -358,3 +358,28 @@
     color: #F57C00;
     font-weight: 600;
 }
+
+/* ...existing code... */
+
+.compare-with-dropdown {
+    min-width: 200px;
+}
+
+.db-context {
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin: 0 0.5rem;
+}
+
+.db-context[data-db="db1"] {
+    background: rgba(33, 150, 243, 0.1);
+    color: #1976D2;
+}
+
+.db-context[data-db="db2"] {
+    background: rgba(156, 39, 176, 0.1);
+    color: #7B1FA2;
+}
+
+/* ...rest of existing code... */
