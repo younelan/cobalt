@@ -1,6 +1,12 @@
 <?php
 require_once '../config.php';
 
+if (!isset($_SESSION['db_user']) || !isset($_SESSION['db_pass'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Not authenticated']);
+    exit;
+}
+
 header('Content-Type: application/json');
 
 if (!isset($_GET['db'])) {

@@ -1,6 +1,5 @@
 <?php
 require_once './config.php';
-define('ABSPATH', dirname(__FILE__));
 
 // Check if user is authenticated
 $isAuthenticated = isset($_SESSION['db_user']) && isset($_SESSION['db_pass']);
@@ -42,15 +41,6 @@ if (!$isAuthenticated) {
     exit;
 }
 
-// Handle comparison form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['db1'], $_POST['db2'])) {
-    $pageTitle = "Comparing {$_POST['db1']} vs {$_POST['db2']}";
-    require_once ABSPATH . '/templates/header.php';
-    require_once ABSPATH . '/templates/comparison_result.php';
-    require_once ABSPATH . '/templates/footer.php';
-    exit;
-}
-
 try {
     $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -60,11 +50,11 @@ try {
 }
 
 $pageTitle = 'Database Structure Comparison';
-require_once ABSPATH . '/templates/header.php';
+require_once 'templates/header.php';
 ?>
 
 <div class="container-fluid mt-4">
-    <form id="dbCompareForm" method="post">
+    <form id="dbCompareForm" method="post" action="templates/comparison_result.php">
         <div class="row mb-4">
             <!-- Database selects -->
             <div class="col-12">
@@ -127,4 +117,4 @@ require_once ABSPATH . '/templates/header.php';
     
     <div id="comparison-results" class="mt-4"></div>
 </div>
-<?php require_once ABSPATH . '/templates/footer.php'; ?>
+<?php require_once 'templates/footer.php'; ?>

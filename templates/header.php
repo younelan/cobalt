@@ -1,3 +1,10 @@
+<?php
+// Prevent direct access
+if (!defined('ABSPATH')) {
+    http_response_code(403);
+    die('Forbidden');
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,3 +19,12 @@
 </head>
 <body>
 <div class="container-fluid py-3">
+    <?php if (isset($_SESSION['db_user'])): ?>
+        <div class="d-flex justify-content-between mb-3">
+            <h1><?php echo $pageTitle ?? 'Database Comparison'; ?></h1>
+            <div>
+                <span class="text-muted me-3">Connected as: <?php echo htmlspecialchars($_SESSION['db_user']); ?></span>
+                <a href="logout.php" class="btn btn-outline-danger btn-sm">Logout</a>
+            </div>
+        </div>
+    <?php endif; ?>

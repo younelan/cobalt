@@ -1,3 +1,36 @@
+function handleAuth() {
+    const form = document.getElementById('loginForm');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            
+            fetch('auth.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Authentication failed');
+                }
+            });
+        });
+    }
+}
+
+function handleFetchError(response) {
+    if (!response.ok) {
+        if (response.status === 401) {
+            window.location.reload(); // Redirect to login
+        }
+        throw new Error('Network response was not ok');
+    }
+    return response;
+}
+
 function updateTables(dbSelect, tableContainer) {
     const dbName = dbSelect.value;
     if (!dbName) {
@@ -6,6 +39,7 @@ function updateTables(dbSelect, tableContainer) {
     }
 
     fetch(`ajax/get_tables.php?db=${dbName}`)
+        .then(handleFetchError)
         .then(response => response.json())
         .then(tables => {
             tableContainer.innerHTML = tables.map(table => `
@@ -26,6 +60,7 @@ function highlightMissingTables() {
     if (!db1 || !db2) return;
 
     fetch(`ajax/compare_tables.php?db1=${db1}&db2=${db2}`)
+        .then(handleFetchError)
         .then(response => response.json())
         .then(data => {
             // Reset all labels and checkboxes
@@ -83,6 +118,7 @@ function handleSelectAll(target, select) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    handleAuth();
     // Initialize from localStorage
     ['db1', 'db2'].forEach(dbId => {
         const storedDb = localStorage.getItem(dbId);

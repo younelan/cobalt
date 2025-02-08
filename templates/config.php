@@ -1,13 +1,8 @@
 <?php
 session_start();
 
-// Define path constants
-define('ABSPATH', dirname(__FILE__));
-define('TEMPLATE_PATH', ABSPATH . '/templates');
-define('AJAX_PATH', ABSPATH . '/ajax');
-
 // Prevent direct access to this file
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
+if (!defined('ABSPATH') && basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     die('Direct access not permitted');
 }
 
