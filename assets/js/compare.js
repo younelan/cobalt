@@ -106,9 +106,18 @@ function highlightMissingTables() {
                     const diffDiv = document.getElementById(`${dbId}-${table}-diff`);
                     if (diffDiv) {
                         let html = '';
-                        if (missingInDb2.length) html += `<div>Missing in DB2: ${missingInDb2.join(', ')}</div>`;
-                        if (missingInDb1.length) html += `<div>Missing in DB1: ${missingInDb1.join(', ')}</div>`;
-                        if (typeMismatch.length) html += `<div>Type mismatch: ${typeMismatch.join(', ')}</div>`;
+                        if (missingInDb2.length) {
+                            html += `<div><span class="difference-label">Missing in DB2:</span> ` +
+                                   `<span class="difference-value">${missingInDb2.join(', ')}</span></div>`;
+                        }
+                        if (missingInDb1.length) {
+                            html += `<div><span class="difference-label">Missing in DB1:</span> ` +
+                                   `<span class="difference-value">${missingInDb1.join(', ')}</span></div>`;
+                        }
+                        if (typeMismatch.length) {
+                            html += `<div class="type-mismatch"><span class="difference-label">Type mismatch:</span> ` +
+                                   `<span class="difference-value">${typeMismatch.join(', ')}</span></div>`;
+                        }
                         diffDiv.innerHTML = html;
                     }
                 });

@@ -21,7 +21,23 @@ try {
     $pdo1 = new PDO("mysql:host=$host;dbname=$db1;charset=utf8mb4", $user, $password);
     $pdo2 = new PDO("mysql:host=$host;dbname=$db2;charset=utf8mb4", $user, $password);
     
-    echo "<h2>Comparing Tables: {$db1} vs {$db2}</h2>";
+    echo "<div class='comparison-nav'>
+            <div class='container'>
+                <div class='d-flex justify-content-between align-items-center'>
+                    <h4 class='mb-0'>
+                        Comparing: 
+                        <span class='text-primary'>" . htmlspecialchars($db1) . "</span>
+                        vs
+                        <span class='text-primary'>" . htmlspecialchars($db2) . "</span>
+                    </h4>
+                    <a href='./' class='btn btn-outline-secondary'>
+                        <i class='fas fa-arrow-left'></i> Back to Comparison
+                    </a>
+                </div>
+            </div>
+          </div>";
+
+    echo "<div class='container'>";
     
     foreach (array_intersect($selected_tables1, $selected_tables2) as $table) {
         // Get column information for both tables
@@ -128,6 +144,7 @@ try {
         echo "</div></div>";
     }
     
+    echo "</div>";
     echo "<div class='mt-3'><a href='index.php' class='btn btn-primary'>New Comparison</a></div>";
     
 } catch (PDOException $e) {

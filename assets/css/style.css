@@ -1,8 +1,52 @@
-
 .differences {
     font-size: 0.85em;
-    color: #666;
+    padding-left: 1.5rem;
+    border-left: 2px solid #eee;
+    margin: 0.3rem 0 0.3rem 0.5rem;
 }
 .differences div {
     margin-bottom: 2px;
+}
+
+.difference-label {
+    color: #666;
+    font-weight: 500;
+    display: inline-block;
+    min-width: 100px;
+}
+
+.difference-value {
+    color: #2196F3;
+    font-family: monospace;
+}
+
+.type-mismatch .difference-value {
+    color: #FFA000;
+}
+
+.comparison-nav {
+    background: #f8f9fa;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.table-differences {
+    border-left: 3px solid #e9ecef;
+    padding: 0.5rem 0 0.5rem 1rem;
+    margin: 1rem 0;
+}
+
+.table-name {
+    font-size: 1.1rem;
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.differences-section {
+    margin-top: 0.5rem;
 }
