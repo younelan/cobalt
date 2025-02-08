@@ -104,7 +104,7 @@ require_once ABSPATH . '/templates/header.php';
                         </div>
                     </div>
                     <div class="card-body">
-                        <div id="tables1" class="table-container"></div>
+                        <div id="tables1"></div>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@ require_once ABSPATH . '/templates/header.php';
                         </div>
                     </div>
                     <div class="card-body">
-                        <div id="tables2" class="table-container"></div>
+                        <div id="tables2"></div>
                     </div>
                 </div>
             </div>

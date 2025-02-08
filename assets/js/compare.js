@@ -43,17 +43,42 @@ function updateTables(dbSelect, tableContainer) {
         .then(response => response.json())
         .then(tables => {
             tableContainer.innerHTML = tables.map(table => `
-                <div class="table-entry mb-2">
-                    <div class="form-check">
+                <div class="table-entry">
+                    <div class="form-check d-flex align-items-center">
                         <input type="checkbox" class="form-check-input" name="tables${dbSelect.id.slice(-1)}[]" 
                                value="${table}" id="${dbSelect.id}-${table}" checked>
                         <label class="form-check-label" for="${dbSelect.id}-${table}">${table}</label>
                     </div>
-                    <div class="differences small text-muted ms-4" id="${dbSelect.id}-${table}-diff"></div>
+                    <div class="differences" id="${dbSelect.id}-${table}-diff"></div>
                 </div>
             `).join('');
             highlightMissingTables();
         });
+}
+
+function formatDifference(type, fields, dbContext = '') {
+    if (!fields || !fields.length) return '';
+    return `<div class="difference-item">
+        <span class="keyword">${type}</span>
+        <span class="field-list">${Array.isArray(fields) ? fields.join(', ') : fields}</span>
+        ${dbContext ? `<span class="db-context">${dbContext}</span>` : ''}
+    </div>`;
+}
+
+function formatTypeMismatch(typeMismatch, dbId) {
+    if (!typeMismatch.length) return '';
+    
+    return `<div class="type-mismatch">
+        <span class="difference-label">Type mismatch:</span>
+        ${typeMismatch.map(mismatch => {
+            // Each mismatch should contain: "field_name: type1 vs type2"
+            const [fieldName, typeInfo] = mismatch.split(': ');
+            const [db1Type, db2Type] = typeInfo.split(' vs ');
+            return `<div class="field-list">
+                ${fieldName}: ${dbId === 'db1' ? db1Type : db2Type} vs ${dbId === 'db1' ? db2Type : db1Type}
+            </div>`;
+        }).join('')}
+    </div>`;
 }
 
 function highlightMissingTables() {
@@ -69,6 +94,11 @@ function highlightMissingTables() {
         .then(handleFetchError)
         .then(response => response.json())
         .then(data => {
+            if (!data || typeof data !== 'object') {
+                console.error('Invalid data received from server');
+                return;
+            }
+
             // Reset all labels
             document.querySelectorAll('#tables1 label, #tables2 label').forEach(label => {
                 label.classList.remove('text-danger');
@@ -76,52 +106,93 @@ function highlightMissingTables() {
             });
             
             // Handle missing tables
-            data.db1.forEach(table => {
-                const checkbox = document.querySelector(`#db1-${table}`);
-                const label = checkbox?.nextElementSibling;
-                if (checkbox && label) {
-                    label.classList.add('text-danger');
-                    checkbox.checked = false;
-                    label.setAttribute('title', 'Table missing in Database 2');
-                }
-            });
-            
-            data.db2.forEach(table => {
-                const checkbox = document.querySelector(`#db2-${table}`);
-                const label = checkbox?.nextElementSibling;
-                if (checkbox && label) {
-                    label.classList.add('text-danger');
-                    checkbox.checked = false;
-                    label.setAttribute('title', 'Table missing in Database 1');
-                }
-            });
-
-            // Display differences under each table
-            for (const [table, diffs] of Object.entries(data.differences)) {
-                const missingInDb1 = diffs.filter(d => d[0].startsWith('Field missing in db1')).map(d => d[0].split(': ')[1]);
-                const missingInDb2 = diffs.filter(d => d[0].startsWith('Field missing in db2')).map(d => d[0].split(': ')[1]);
-                const typeMismatch = diffs.filter(d => d[0].includes('type mismatch')).map(d => d[0].split(': ')[1]);
-
-                ['db1', 'db2'].forEach(dbId => {
-                    const diffDiv = document.getElementById(`${dbId}-${table}-diff`);
-                    if (diffDiv) {
-                        let html = '';
-                        if (missingInDb2.length) {
-                            html += `<div><span class="difference-label">Missing in DB2:</span> ` +
-                                   `<span class="difference-value">${missingInDb2.join(', ')}</span></div>`;
-                        }
-                        if (missingInDb1.length) {
-                            html += `<div><span class="difference-label">Missing in DB1:</span> ` +
-                                   `<span class="difference-value">${missingInDb1.join(', ')}</span></div>`;
-                        }
-                        if (typeMismatch.length) {
-                            html += `<div class="type-mismatch"><span class="difference-label">Type mismatch:</span> ` +
-                                   `<span class="difference-value">${typeMismatch.join(', ')}</span></div>`;
-                        }
-                        diffDiv.innerHTML = html;
+            if (Array.isArray(data.db1)) {
+                data.db1.forEach(table => {
+                    const checkbox = document.querySelector(`#db1-${table}`);
+                    const label = checkbox?.nextElementSibling;
+                    if (checkbox && label) {
+                        label.classList.add('text-danger');
+                        checkbox.checked = false;
+                        label.setAttribute('title', 'Table missing in Database 2');
                     }
                 });
             }
+            
+            if (Array.isArray(data.db2)) {
+                data.db2.forEach(table => {
+                    const checkbox = document.querySelector(`#db2-${table}`);
+                    const label = checkbox?.nextElementSibling;
+                    if (checkbox && label) {
+                        label.classList.add('text-danger');
+                        checkbox.checked = false;
+                        label.setAttribute('title', 'Table missing in Database 1');
+                    }
+                });
+            }
+
+            // Display differences under each table
+            if (data.differences && typeof data.differences === 'object') {
+                const allTables = new Set([
+                    ...document.querySelectorAll('#tables1 .table-entry label'),
+                    ...document.querySelectorAll('#tables2 .table-entry label')
+                ].map(label => label.textContent));
+
+                allTables.forEach(table => {
+                    const diffs = data.differences[table] || [];
+                    ['db1', 'db2'].forEach(dbId => {
+                        const diffDiv = document.getElementById(`${dbId}-${table}-diff`);
+                        if (!diffDiv) return;
+
+                        // If table exists in both DBs and has no differences
+                        if (!diffs.length && 
+                            !data.db1.includes(table) && 
+                            !data.db2.includes(table)) {
+                            diffDiv.innerHTML = '<div class="identical-notice">✓ Identical structure</div>';
+                            return;
+                        }
+
+                        const missingInDb1 = diffs
+                            .filter(d => d[0]?.startsWith('Field missing in db1'))
+                            .map(d => {
+                                const field = d[0]?.split(': ')[1];
+                                return field || '';
+                            })
+                            .filter(field => field !== '');
+
+                        const missingInDb2 = diffs
+                            .filter(d => d[0]?.startsWith('Field missing in db2'))
+                            .map(d => {
+                                const field = d[0]?.split(': ')[1];
+                                return field || '';
+                            })
+                            .filter(field => field !== '');
+
+                        const typeMismatch = diffs
+                            .filter(d => d[0]?.includes('type mismatch'))
+                            .map(d => {
+                                // Split "Field field_name type mismatch: type1 vs type2"
+                                const [prefix, typeInfo] = d[0].split('type mismatch: ');
+                                const fieldName = prefix.split(' ')[1]; // Get the field name
+                                return `${fieldName}: ${typeInfo}`; // Return "field_name: type1 vs type2"
+                            });
+
+                        let html = '';
+                        if (missingInDb2.length) {
+                            html += formatDifference('Missing', missingInDb2, 'in DB2');
+                        }
+                        if (missingInDb1.length) {
+                            html += formatDifference('Missing', missingInDb1, 'in DB1');
+                        }
+                        if (typeMismatch.length) {
+                            html += formatTypeMismatch(typeMismatch, dbId);
+                        }
+                        diffDiv.innerHTML = html;
+                    });
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching comparison data:', error);
         });
 }
 
