@@ -28,7 +28,7 @@ $selected = $session->getSelectedDatabases();
         .status-badge {
             padding: 0.25em 0.6em;
             border-radius: 12px;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
         .header-section {
             background: #2c3e50;
@@ -36,6 +36,33 @@ $selected = $session->getSelectedDatabases();
             padding: 1rem 0;
             margin-bottom: 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .table-entry {
+            transition: background-color 0.2s;
+        }
+        .table-entry:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+        .text-muted small {
+            line-height: 1.6;
+        }
+        .diff-label {
+            display: inline-block;
+            padding: 0.15em 0.5em;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-right: 0.5em;
+        }
+        .diff-type { background: #fff3cd; color: #856404; }
+        .diff-missing { background: #f8d7da; color: #721c24; }
+        .diff-index { background: #cce5ff; color: #004085; }
+        .diff-arrow { color: #6c757d; margin: 0 0.3em; }
+        .table-differences {
+            padding: 0.5em 1em;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-top: 0.5em;
         }
     </style>
 </head>
