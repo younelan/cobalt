@@ -43,10 +43,13 @@ function updateTables(dbSelect, tableContainer) {
         .then(response => response.json())
         .then(tables => {
             tableContainer.innerHTML = tables.map(table => `
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="tables${dbSelect.id.slice(-1)}[]" 
-                           value="${table}" id="${dbSelect.id}-${table}" checked>
-                    <label class="form-check-label" for="${dbSelect.id}-${table}">${table}</label>
+                <div class="table-entry mb-2">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="tables${dbSelect.id.slice(-1)}[]" 
+                               value="${table}" id="${dbSelect.id}-${table}" checked>
+                        <label class="form-check-label" for="${dbSelect.id}-${table}">${table}</label>
+                    </div>
+                    <div class="differences small text-muted ms-4" id="${dbSelect.id}-${table}-diff"></div>
                 </div>
             `).join('');
             highlightMissingTables();
@@ -59,11 +62,14 @@ function highlightMissingTables() {
 
     if (!db1 || !db2) return;
 
+    // Reset all differences
+    document.querySelectorAll('.differences').forEach(div => div.innerHTML = '');
+
     fetch(`ajax/compare_tables.php?db1=${db1}&db2=${db2}`)
         .then(handleFetchError)
         .then(response => response.json())
         .then(data => {
-            // Reset all labels and checkboxes
+            // Reset all labels
             document.querySelectorAll('#tables1 label, #tables2 label').forEach(label => {
                 label.classList.remove('text-danger');
                 label.setAttribute('title', '');
@@ -90,21 +96,22 @@ function highlightMissingTables() {
                 }
             });
 
-            // Display differences in the comparison results area
-            const resultsDiv = document.getElementById('comparison-results');
-            if (Object.keys(data.differences).length > 0) {
-                let html = '<div class="alert alert-warning"><h4>Structure Differences Found:</h4><ul>';
-                for (const [table, diffs] of Object.entries(data.differences)) {
-                    html += `<li><strong>${table}</strong><ul>`;
-                    diffs.forEach(diff => {
-                        html += `<li>${diff[0]}</li>`;
-                    });
-                    html += '</ul></li>';
-                }
-                html += '</ul></div>';
-                resultsDiv.innerHTML = html;
-            } else {
-                resultsDiv.innerHTML = '<div class="alert alert-success">No structure differences found in common tables.</div>';
+            // Display differences under each table
+            for (const [table, diffs] of Object.entries(data.differences)) {
+                const missingInDb1 = diffs.filter(d => d[0].startsWith('Field missing in db1')).map(d => d[0].split(': ')[1]);
+                const missingInDb2 = diffs.filter(d => d[0].startsWith('Field missing in db2')).map(d => d[0].split(': ')[1]);
+                const typeMismatch = diffs.filter(d => d[0].includes('type mismatch')).map(d => d[0].split(': ')[1]);
+
+                ['db1', 'db2'].forEach(dbId => {
+                    const diffDiv = document.getElementById(`${dbId}-${table}-diff`);
+                    if (diffDiv) {
+                        let html = '';
+                        if (missingInDb2.length) html += `<div>Missing in DB2: ${missingInDb2.join(', ')}</div>`;
+                        if (missingInDb1.length) html += `<div>Missing in DB1: ${missingInDb1.join(', ')}</div>`;
+                        if (typeMismatch.length) html += `<div>Type mismatch: ${typeMismatch.join(', ')}</div>`;
+                        diffDiv.innerHTML = html;
+                    }
+                });
             }
         });
 }

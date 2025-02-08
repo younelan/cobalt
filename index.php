@@ -124,7 +124,5 @@ require_once ABSPATH . '/templates/header.php';
             </div>
         </div>
     </form>
-    
-    <div id="comparison-results" class="mt-4"></div>
 </div>
 <?php require_once ABSPATH . '/templates/footer.php'; ?>
