@@ -98,6 +98,69 @@ $(document).ready(function() {
             const compareWith = tableRow.find('.compare-with').val();
             alert('Details for ' + table + ' compared with ' + compareWith);
         });
+
+        // Handle view switching with improved state management
+        $(document).on('click', '.view-summary, .view-details', function(e) {
+            e.preventDefault();
+            const tableRow = $(this).closest('.table-entry');
+            const table1 = tableRow.data('table');
+            const table2 = tableRow.find('.compare-with').val();
+            const viewType = $(this).hasClass('view-summary') ? 'summary' : 'details';
+            
+            if (viewType === 'summary') {
+                // For summary view, make a fresh comparison to get proper state
+                $.ajax({
+                    url: 'ajax/compare_single_table.php',
+                    method: 'POST',
+                    data: {
+                        db1: $('#db1').val(),
+                        db2: $('#db2').val(),
+                        table1: table1,
+                        table2: table2,
+                        selected: table2,
+                        force_fresh: true,
+                        view: 'summary'
+                    },
+                    success: function(response) {
+                        try {
+                            const result = JSON.parse(response);
+                            if (result.html) {
+                                tableRow.replaceWith(result.html);
+                            }
+                        } catch(e) {
+                            console.error('Error:', e);
+                        }
+                    }
+                });
+            } else {
+                // For detailed view, load the detailed comparison
+                $.ajax({
+                    url: 'ajax/get_table_details.php',
+                    method: 'POST',
+                    data: {
+                        db1: $('#db1').val(),
+                        db2: $('#db2').val(),
+                        table1: table1,
+                        table2: table2,
+                        selected: table2
+                    },
+                    success: function(response) {
+                        try {
+                            const result = JSON.parse(response);
+                            if (result.html) {
+                                tableRow.replaceWith(result.html);
+                            }
+                        } catch(e) {
+                            console.error('Error:', e);
+                        }
+                    }
+                });
+            }
+
+            // Update dropdown active state
+            tableRow.find('.dropdown-item').removeClass('active');
+            tableRow.find('.view-' + viewType).addClass('active');
+        });
     }
 
     $('#db1, #db2').change(function() {

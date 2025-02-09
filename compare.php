@@ -115,6 +115,24 @@ $selected = $session->getSelectedDatabases();
             gap: 0.5rem;
             flex: 1;
         }
+        .comparison-table {
+            border: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+        }
+        .comparison-table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .detailed-comparison {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -171,6 +189,7 @@ $selected = $session->getSelectedDatabases();
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/comparison.js"></script>
 </body>
 </html>

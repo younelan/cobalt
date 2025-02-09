@@ -44,10 +44,10 @@ class TableComparator {
         }
     }
 
-    public function compareTableStructure($table1, $table2 = null) {
-        // If no specific table2 provided, use same name from db2
+    public function compareTableStructure($table1, $table2 = null, $force_fresh = false) {
         $compare_with = $table2 ?? $table1;
         
+        // Always get fresh data if forced
         $columns1 = $this->db->getTableColumns($this->db1_name, $table1);
         $columns2 = $this->db->getTableColumns($this->db2_name, $compare_with);
         $indexes1 = $this->db->getTableIndexes($this->db1_name, $table1);
@@ -72,8 +72,8 @@ class TableComparator {
         ];
     }
 
-    public function getTableDifferences($table1, $table2 = null) {
-        $comparison = $this->compareTableStructure($table1, $table2);
+    public function getTableDifferences($table1, $table2 = null, $force_fresh = false) {
+        $comparison = $this->compareTableStructure($table1, $table2, $force_fresh);
         $diffs = [
             'columns_missing' => [],
             'type_mismatches' => [],
@@ -185,5 +185,21 @@ class TableComparator {
 
     public function tableExistsInDb1($table_name) {
         return isset($this->tables1_lookup[$table_name]);
+    }
+
+    public function generateTableSelect($selectedTable = null) {
+        $select = '<select class="form-select form-select-sm compare-with" style="width: auto; display: inline-block; margin-left: 10px;">';
+        foreach ($this->getTables2() as $table) {
+            $tableName = $table['TABLE_NAME'];
+            $selected = ($tableName === $selectedTable) ? 'selected' : '';
+            $select .= sprintf(
+                '<option value="%s" %s>%s</option>',
+                htmlspecialchars($tableName),
+                $selected,
+                htmlspecialchars($tableName)
+            );
+        }
+        $select .= '</select>';
+        return $select;
     }
 }

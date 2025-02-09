@@ -174,19 +174,30 @@ try {
                         <span class="text-muted">compare with</span>
                         %s
                         <span class="badge %s status-badge ms-2">%s</span>
-                        <button class="btn btn-sm btn-primary float-end compare-details" data-table="%s">Details</button>
+                        <div class="dropdown d-inline-block float-end">
+                            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                View
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item view-summary" href="#" data-table="%s" data-compare="%s">Summary</a></li>
+                                <li><a class="dropdown-item view-details" href="#" data-table="%s" data-compare="%s">Detailed</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="comparison-details">%s</div>
             </div>',
             htmlspecialchars($table_name),
             $statusClass,
-            htmlspecialchars($table_name),  // Added data-table attribute
+            htmlspecialchars($table_name),
             htmlspecialchars($table_name),
             $table_select,
             $statusBadgeClass,
             htmlspecialchars($statusText),
-            htmlspecialchars($table_name),  // Added data-table to button
+            htmlspecialchars($table_name),
+            htmlspecialchars($table_name),
+            htmlspecialchars($table_name),
+            htmlspecialchars($table_name),
             $details
         );
     }
