@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/DBSessionManager.php';
 
@@ -140,10 +141,10 @@ $selected = $session->getSelectedDatabases();
         <div class="container">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2>DB Compare</h2>
+                    <h2><?= T("DB Compare") ?></h2>
                 </div>
                 <div class="col text-end">
-                    <small>Connected as: <?php echo htmlspecialchars($credentials['username']); ?></small>
+                    <small><?= T("Connected as: {username}" , ['username' => htmlspecialchars($credentials['username'])] )  ?></small>
                 </div>
             </div>
         </div>
@@ -153,12 +154,12 @@ $selected = $session->getSelectedDatabases();
             <div class="col-12 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Select Databases to Compare</h5>
+                        <h5 class="card-title"><?= T("Select Databases to Compare") ?></h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="db1" class="form-label">Database 1</label>
+                                <label for="db1" class="form-label"><?= T("Database 1") ?></label>
                                 <select id="db1" class="form-select">
-                                    <option value="">Select Database 1</option>
+                                    <option value=""><?= T("Select Database 1") ?></option>
                                     <?php foreach ($databases as $database): ?>
                                         <option value="<?php echo htmlspecialchars($database); ?>"
                                                 <?php echo ($selected && $selected['db1'] === $database) ? 'selected' : ''; ?>>
@@ -168,9 +169,9 @@ $selected = $session->getSelectedDatabases();
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="db2" class="form-label">Database 2</label>
+                                <label for="db2" class="form-label"><?= T("Database 2") ?></label>
                                 <select id="db2" class="form-select">
-                                    <option value="">Select Database 2</option>
+                                    <option value=""><?= T("Select Database 2") ?></option>
                                     <?php foreach ($databases as $database): ?>
                                         <option value="<?php echo htmlspecialchars($database); ?>"
                                                 <?php echo ($selected && $selected['db2'] === $database) ? 'selected' : ''; ?>>
@@ -185,7 +186,7 @@ $selected = $session->getSelectedDatabases();
             </div>
         </div>
         <div id="comparison-results" class="mt-4">
-            <div class="alert alert-info">Please select two databases to compare.</div>
+            <div class="alert alert-info"><?= T("Please select two databases to compare") ?></div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
