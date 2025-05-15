@@ -86,14 +86,14 @@ class TableComparator {
             
             if (!empty($missing_in_db1)) {
                 $diffs['columns_missing'][] = [
-                    'label' => 'Missing in DB1',
+                    'label' => T('Missing in DB1'),
                     'class' => 'diff-missing',
                     'content' => implode(', ', array_keys($missing_in_db1))
                 ];
             }
             if (!empty($missing_in_db2)) {
                 $diffs['columns_missing'][] = [
-                    'label' => 'Missing in DB2',
+                    'label' => T('Missing in DB2'),
                     'class' => 'diff-missing',
                     'content' => implode(', ', array_keys($missing_in_db2))
                 ];
@@ -124,14 +124,14 @@ class TableComparator {
 
             if (!empty($missing_idx_db1)) {
                 $diffs['indexes'][] = [
-                    'label' => 'Indexes DB1',
+                    'label' => T('Indexes DB1'),
                     'class' => 'diff-index',
                     'content' => implode(', ', array_keys($missing_idx_db1))
                 ];
             }
             if (!empty($missing_idx_db2)) {
                 $diffs['indexes'][] = [
-                    'label' => 'Indexes DB2',
+                    'label' => T('Indexes DB2'),
                     'class' => 'diff-index',
                     'content' => implode(', ', array_keys($missing_idx_db2))
                 ];
