@@ -5,7 +5,7 @@ require_once __DIR__ . '/../classes/DBSessionManager.php';
 require_once __DIR__ . '/../classes/TableComparator.php';
 
 if (!isset($_POST['db1']) || !isset($_POST['db2']) || !isset($_POST['table1']) || !isset($_POST['table2'])) {
-    exit('Invalid request');
+    exit(T('Invalid request'));
 }
 
 try {
@@ -23,7 +23,7 @@ try {
     </div>';
 
     if (empty($differences)) {
-        $html .= '<div class="text-success">Tables are identical</div>';
+        $html .= '<div class="text-success">' . T('Tables are identical') . '</div>';
     } else {
         // Group differences by type
         $missingDiffs = [];
@@ -48,7 +48,7 @@ try {
             $html .= '<div class="text-danger mb-1">' . implode(' | ', $missingDiffs) . '</div>';
         }
         if (!empty($typeDiffs)) {
-            $html .= '<div class="text-warning">Type mismatches: ' . implode(', ', $typeDiffs) . '</div>';
+            $html .= '<div class="text-warning">' . T('Type mismatches') . ': ' . implode(', ', $typeDiffs) . '</div>';
         }
         if (!empty($indexDiffs)) {
             $html .= '<div class="text-info">' . implode(' | ', $indexDiffs) . '</div>';
