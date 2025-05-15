@@ -1,11 +1,12 @@
 <?php
 session_start();
+require_once __DIR__ . '/../init.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/DBSessionManager.php';
 require_once __DIR__ . '/../classes/TableComparator.php';
 
 if (!isset($_POST['db1']) || !isset($_POST['db2'])) {
-    echo json_encode(['error' => 'Invalid request']);
+    echo json_encode(['error' => T('Invalid request')]);
     exit;
 }
 
@@ -20,24 +21,24 @@ try {
 
     $output = '<div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Comparison Summary</h5>
+            <h5 class="mb-0">' . T('Comparison Summary') . '</h5>
         </div>
         <div class="card-body">
             <div class="row text-center">
                 <div class="col-md-3">
-                    <h6>Total Tables</h6>
+                    <h6>' . T("Total Tables") . '</h6>
                     <p class="h4">DB1: ' . $stats['total1'] . ' | DB2: ' . $stats['total2'] . '</p>
                 </div>
                 <div class="col-md-3">
-                    <h6>Identical Tables</h6>
+                    <h6>' . T("Identical Tables") . '</h6>
                     <p class="h4 text-success">' . $stats['identical'] . '</p>
                 </div>
                 <div class="col-md-3">
-                    <h6>Missing in DB1</h6>
+                    <h6>' . T("Missing in DB1") . '</h6>
                     <p class="h4 text-danger">' . $stats['missing_db1'] . '</p>
                 </div>
                 <div class="col-md-3">
-                    <h6>Missing in DB2</h6>
+                    <h6>' . T("Missing in DB2") . '</h6>
                     <p class="h4 text-danger">' . $stats['missing_db2'] . '</p>
                 </div>
             </div>
@@ -47,14 +48,14 @@ try {
         <div class="card-header">
             <div class="row align-items-center">
                 <div class="col-auto"><input type="checkbox" id="select-all" class="form-check-input me-2"></div>
-                <div class="col">Tables Comparison</div>
+                <div class="col">' . T("Tables Comparison") . '</div>
             </div>
         </div>
         <div class="card-body p-0">
             <div class="summary-section p-3 bg-light border-bottom">
-                <div class="text-danger mb-1">Missing Tables in DB1: ' . implode(', ', $comparator->getMissingInDb1()) . '</div>
-                <div class="text-danger mb-1">Missing Tables in DB2: ' . implode(', ', $comparator->getMissingInDb2()) . '</div>
-                <div class="text-warning">Structure Mismatches: ' . implode(', ', $comparator->getStructureMismatches()) . '</div>
+                <div class="text-danger mb-1">' . T("Missing Tables in DB1") . ': ' . implode(', ', $comparator->getMissingInDb1()) . '</div>
+                <div class="text-danger mb-1">' . T("Missing Tables in DB2") . ': ' . implode(', ', $comparator->getMissingInDb2()) . '</div>
+                <div class="text-warning">' . T("Structure Mismatches") . ': ' . implode(', ', $comparator->getStructureMismatches()) . '</div>
             </div>';
 
     // Pre-generate dropdown options for all tables in DB2
@@ -98,7 +99,7 @@ try {
             $status = empty($differences) ? 'identical' : 'different';
             $statusClass = empty($differences) ? 'table-identical' : 'table-different';
             $statusBadgeClass = empty($differences) ? 'bg-success' : 'bg-warning';
-            $statusText = empty($differences) ? 'Identical' : 'Structure Mismatch';
+            $statusText = empty($differences) ? T('Identical') : T('Structure Mismatch');
             
             if (empty($differences)) {
                 $stats['identical']++;
@@ -107,8 +108,8 @@ try {
             $status = 'missing';
             $statusClass = 'table-missing';
             $statusBadgeClass = 'bg-danger';
-            $statusText = 'Missing in DB2';
-            $differences = ['Table does not exist in DB2'];
+            $statusText = T('Missing in DB2');
+            $differences = [T('Table does not exist in DB2')];
         }
         
         $details = '';
@@ -155,7 +156,7 @@ try {
             }
             if (!empty($typeDiffs)) {
                 $details .= '<div class="diff-line">
-                    <span class="diff-title">Mismatches:</span>
+                    <span class="diff-title">' . T('Mismatches') .':</span>
                     <div class="diff-items-wrapper">' . implode('', $typeDiffs) . '</div>
                 </div>';
             }
@@ -171,16 +172,16 @@ try {
                     <div class="col-auto"><input type="checkbox" class="form-check-input table-select me-2"></div>
                     <div class="col">
                         <span class="h6 mb-0">%s</span>
-                        <span class="text-muted">compare with</span>
+                        <span class="text-muted">' . T('compare with') . '</span>
                         %s
                         <span class="badge %s status-badge ms-2">%s</span>
                         <div class="dropdown d-inline-block float-end">
                             <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                View
+                                ' . T('View') . '
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item view-summary" href="#" data-table="%s" data-compare="%s">Summary</a></li>
-                                <li><a class="dropdown-item view-details" href="#" data-table="%s" data-compare="%s">Detailed</a></li>
+                                <li><a class="dropdown-item view-summary" href="#" data-table="%s" data-compare="%s">' . T('Summary') . '</a></li>
+                                <li><a class="dropdown-item view-details" href="#" data-table="%s" data-compare="%s">' . T('Detailed') . '</a></li>
                             </ul>
                         </div>
                     </div>
@@ -193,7 +194,7 @@ try {
             htmlspecialchars($table_name),
             $table_select,
             $statusBadgeClass,
-            htmlspecialchars($statusText),
+            T(htmlspecialchars($statusText)),
             htmlspecialchars($table_name),
             htmlspecialchars($table_name),
             htmlspecialchars($table_name),
@@ -212,11 +213,11 @@ try {
                         <div class="col-auto"><input type="checkbox" class="form-check-input table-select me-2"></div>
                         <div class="col">
                             <span class="h6 mb-0">%s</span>
-                            <span class="badge bg-danger status-badge ms-2">Missing in DB1</span>
+                            <span class="badge bg-danger status-badge ms-2">' . T("Missing in DB1") . '</span>
                             <button class="btn btn-sm btn-primary float-end compare-details" 
                                     data-table="%s" 
                                     data-db1="%s" 
-                                    data-db2="%s">Details</button>
+                                    data-db2="%s">' . T('Details') .'</button>
                         </div>
                     </div>
                 </div>',
@@ -232,6 +233,6 @@ try {
     echo $output;
 
 } catch (Exception $e) {
-    echo json_encode(['error' => 'Error performing comparison: ' . $e->getMessage()]);
+    echo json_encode(['error' => T('Error performing comparison: ') . $e->getMessage()]);
     exit;
 }

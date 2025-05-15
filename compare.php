@@ -19,7 +19,7 @@ $selected = $session->getSelectedDatabases();
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Database Comparison Tool</title>
+    <title><?= T("Database Comparison Tool") ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .table-diff { border-left: 4px solid; }
@@ -192,5 +192,15 @@ $selected = $session->getSelectedDatabases();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/comparison.js"></script>
+    <script>
+        const translations = <?php echo json_encode($translations); ?>;
+        function T(key, vars = {}) {
+            let translation = translations['fr'][key] || key;
+            for (const [varName, value] of Object.entries(vars)) {
+                translation = translation.replace(`{${varName}}`, value);
+            }
+            return translation;
+        }
+    </script>
 </body>
 </html>
