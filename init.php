@@ -103,10 +103,72 @@ $translations = [
         'Comparison Results' => 'Resultados de la comparación',
         'No differences found' => 'No se encontraron diferencias',
     ],
+    "de" => [
+        'Database Comparison Tool' => 'Werkzeug zum Datenbankvergleich',
+        'Login' => 'Anmelden',
+        'Host' => 'Host',
+        'Username' => 'Benutzername',
+        'Password' => 'Passwort',
+        "Connected as: {username}" => "Angemeldet als: {username}",
+        'Select Databases to Compare' => 'Datenbanken zum Vergleichen auswählen',
+        'Database 1' => 'Datenbank 1',
+        'Database 2' => 'Datenbank 2',
+        'Select Database 1' => 'Datenbank 1 auswählen',
+        'Select Database 2' => 'Datenbank 2 auswählen',
+        'Remember username' => 'Benutzername merken',
+        'Connect' => 'Verbinden',
+        "Please select two databases to compare" => "Bitte wählen Sie zwei Datenbanken zum Vergleichen aus",
+        'Connection failed. Please check your credentials.' => 'Verbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.',
+        'Total Tables' => 'Gesamte Tabellen',
+        'Missing in DB1' => 'Fehlt in DB1',
+        'Missing in DB2' => 'Fehlt in DB2',
+        'Tables Comparison' => 'Tabellenvergleich',
+        'Invalid request' => 'Ungültige Anfrage',
+        'Table Comparison' => 'Tabellenvergleich',
+        'Missing Tables in DB1' => 'Fehlende Tabellen in DB1',
+        'Missing Tables in DB2' => 'Fehlende Tabellen in DB2',
+        'Structure Mismatches' => 'Strukturunterschiede',
+        'Structure Mismatch' => 'Strukturfehler',
+        'Data Mismatches' => 'Datenunterschiede',
+        'Indexes DB1' => 'Indizes DB1',
+        'Indexes DB2' => 'Indizes DB2',
+        'No Mismatches Found' => 'Keine Abweichungen gefunden',
+        'Tables are identical' => 'Die Tabellen sind identisch',
+        'Table Structure' => 'Tabellenstruktur',
+        'Table Data' => 'Tabellendaten',
+        'Table Name' => 'Tabellenname',
+        'Column Name' => 'Spaltenname',
+        'Column Type' => 'Spaltentyp',
+        'Column Length' => 'Spaltenlänge',
+        'View' => 'Ansicht',
+        'Index' => 'Index',
+        'Summary' => 'Zusammenfassung',
+        'Detailed' => 'Detailliert',
+        'Details' => 'Details',
+        'compare with' => 'vergleichen mit',
+        'Identical Tables' => 'Identische Tabellen',
+        'Identical' => 'Identisch',
+        'Different' => 'Unterschiedlich',
+        'Differences' => 'Unterschiede',
+        'Comparison Summary' => 'Vergleichszusammenfassung',
+        'Comparison Results' => 'Vergleichsergebnisse',
+        'No differences found' => 'Keine Unterschiede gefunden',
+    ],
 ];
 
-function T($key, $vars=[], $lang = 'fr') {
-    global $translations;
+//$defaultLang = 'es';
+if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    $detectedLang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+    if (isset($translations[$detectedLang])) {
+        $defaultLang = $detectedLang;
+    }
+}
+
+function T($key, $vars=[], $lang = null) {
+    global $translations, $defaultLang;
+    if ($lang === null) {
+        $lang = $defaultLang;
+    }
 
     if (isset($translations[$lang][$key])) {
         $retval = $translations[$lang][$key];
