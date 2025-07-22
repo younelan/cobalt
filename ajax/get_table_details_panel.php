@@ -5,14 +5,14 @@ require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/DBSessionManager.php';
 
 if (!isset($_POST['db']) || !isset($_POST['table'])) {
-    echo '<div class="alert alert-danger">Invalid request</div>';
+    echo '<div class="alert alert-danger">' . T('Invalid request') . '</div>';
     exit;
 }
 
 $session = new DBSessionManager();
 $credentials = $session->getCredentials();
 if (!$credentials) {
-    echo '<div class="alert alert-danger">Not authenticated</div>';
+    echo '<div class="alert alert-danger">' . T('Not authenticated') . '</div>';
     exit;
 }
 
@@ -23,18 +23,18 @@ $columns = $db->getTableColumns($database, $table);
 $indexes = $db->getTableIndexes($database, $table);
 ?>
 <div class="p-3">
-  <h5>Table: <span class="text-primary"><?= htmlspecialchars($table) ?></span></h5>
-  <h6 class="mt-4">Columns</h6>
+  <h5><?= T('Table:') ?> <span class="text-primary"><?= htmlspecialchars($table) ?></span></h5>
+  <h6 class="mt-4"><?= T('Columns') ?></h6>
   <div class="table-responsive">
     <table class="table table-sm table-bordered">
       <thead class="table-light">
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Nullable</th>
-          <th>Default</th>
-          <th>Extra</th>
-          <th>Comment</th>
+          <th><?= T('Name') ?></th>
+          <th><?= T('Type') ?></th>
+          <th><?= T('Nullable') ?></th>
+          <th><?= T('Default') ?></th>
+          <th><?= T('Extra') ?></th>
+          <th><?= T('Comment') ?></th>
         </tr>
       </thead>
       <tbody>
@@ -51,16 +51,16 @@ $indexes = $db->getTableIndexes($database, $table);
       </tbody>
     </table>
   </div>
-  <h6 class="mt-4">Indexes</h6>
+  <h6 class="mt-4"><?= T('Indexes') ?></h6>
   <div class="table-responsive">
     <table class="table table-sm table-bordered">
       <thead class="table-light">
         <tr>
-          <th>Index Name</th>
-          <th>Non Unique</th>
-          <th>Column Name</th>
-          <th>Seq In Index</th>
-          <th>Index Type</th>
+          <th><?= T('Index Name') ?></th>
+          <th><?= T('Non Unique') ?></th>
+          <th><?= T('Column Name') ?></th>
+          <th><?= T('Seq In Index') ?></th>
+          <th><?= T('Index Type') ?></th>
         </tr>
       </thead>
       <tbody>
