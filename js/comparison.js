@@ -1,173 +1,175 @@
-$(document).ready(function() {
-    function loadComparison() {
-        const db1 = $('#db1').val();
-        const db2 = $('#db2').val();
-        
-        if (db1 && db2) {
-            $('#comparison-results').html('<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Loading comparison...</div></div>');
-            
-            $.ajax({
-                url: 'ajax/compare_tables.php',
-                method: 'POST',
-                data: { db1: db1, db2: db2 },
-                success: function(response) {
-                    try {
-                        // Check if response is JSON error
-                        const jsonResponse = JSON.parse(response);
-                        if (jsonResponse.error) {
-                            $('#comparison-results').html('<div class="alert alert-danger">' + jsonResponse.error + '</div>');
-                            return;
-                        }
-                    } catch(e) {
-                        // Not JSON, treat as HTML
-                        $('#comparison-results').html(response);
-                        initializeComparison();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    $('#comparison-results').html('<div class="alert alert-danger">Error: ' + error + '</div>');
-                }
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    function qs(sel, ctx=document) { return ctx.querySelector(sel); }
+    function qsa(sel, ctx=document) { return Array.from(ctx.querySelectorAll(sel)); }
 
-            // Store selected databases
-            localStorage.setItem('selectedDb1', db1);
-            localStorage.setItem('selectedDb2', db2);
+    function setHTML(el, html) { el.innerHTML = html; }
+    function setVal(el, val) { el.value = val; }
+    function getVal(el) { return el.value; }
+    function setProp(el, prop, val) { el[prop] = val; }
+    function closest(el, sel) { while (el && !el.matches(sel)) el = el.parentElement; return el; }
+
+    const db1 = qs('#db1');
+    const db2 = qs('#db2');
+    const results = qs('#comparison-results');
+
+    function loadComparison() {
+        const db1Val = getVal(db1);
+        const db2Val = getVal(db2);
+        if (db1Val && db2Val) {
+            setHTML(results, '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Loading comparison...</div></div>');
+            const formData = new URLSearchParams({ db1: db1Val, db2: db2Val });
+            fetch('ajax/compare_tables.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            })
+            .then(r => r.text())
+            .then(response => {
+                try {
+                    const jsonResponse = JSON.parse(response);
+                    if (jsonResponse.error) {
+                        setHTML(results, '<div class="alert alert-danger">' + jsonResponse.error + '</div>');
+                        return;
+                    }
+                } catch(e) {
+                    setHTML(results, response);
+                    initializeComparison();
+                }
+            })
+            .catch(error => {
+                setHTML(results, '<div class="alert alert-danger">Error: ' + error + '</div>');
+            });
+            localStorage.setItem('selectedDb1', db1Val);
+            localStorage.setItem('selectedDb2', db2Val);
         } else {
-            $('#comparison-results').html('<div class="alert alert-info">Please select two databases to compare.</div>');
+            setHTML(results, '<div class="alert alert-info">Please select two databases to compare.</div>');
         }
     }
 
     // Load stored selections
     const storedDb1 = localStorage.getItem('selectedDb1');
     const storedDb2 = localStorage.getItem('selectedDb2');
-    if (storedDb1) $('#db1').val(storedDb1);
-    if (storedDb2) $('#db2').val(storedDb2);
+    if (storedDb1) setVal(db1, storedDb1);
+    if (storedDb2) setVal(db2, storedDb2);
 
     function initializeComparison() {
-        // Remove all existing event handlers and rebind
-        $(document).off('change', '#select-all, .compare-with');
-        $(document).off('click', '.compare-details');
+        // Remove all existing event handlers and rebind (event delegation)
+        document.removeEventListener('change', delegatedChangeHandler, true);
+        document.removeEventListener('click', delegatedClickHandler, true);
+        document.addEventListener('change', delegatedChangeHandler, true);
+        document.addEventListener('click', delegatedClickHandler, true);
+    }
 
-        // Handle select all
-        $(document).on('change', '#select-all', function() {
-            $('.table-select').prop('checked', $(this).prop('checked'));
-        });
-
-        // Handle table comparison dropdown
-        $(document).on('change', '.compare-with', function() {
-            const tableRow = $(this).closest('.table-entry');
-            const originalTable = tableRow.data('table');  // Get the original table name
-            const compareWith = $(this).val();
-
+    function delegatedChangeHandler(e) {
+        if (e.target.matches('#select-all')) {
+            qsa('.table-select').forEach(cb => setProp(cb, 'checked', e.target.checked));
+        }
+        if (e.target.matches('.compare-with')) {
+            const tableRow = closest(e.target, '.table-entry');
+            const originalTable = tableRow.dataset.table;
+            const compareWith = getVal(e.target);
             if (!compareWith) return;
-
-            $.ajax({
-                url: 'ajax/compare_single_table.php',
-                method: 'POST',
-                data: {
-                    db1: $('#db1').val(),
-                    db2: $('#db2').val(),
-                    table1: originalTable,      // Use the original table name
-                    table2: compareWith,        // Use the selected comparison table
-                    selected: compareWith       // Keep track of selected value
-                },
-                success: function(response) {
-                    try {
-                        const result = JSON.parse(response);
-                        if (result.error) {
-                            alert(result.error);
-                            return;
-                        }
-                        // Replace the table row with the new comparison
-                        const newRow = $(result.html);
-                        tableRow.replaceWith(newRow);
-                        // Make sure the dropdown keeps the selected value
-                        newRow.find('.compare-with').val(compareWith);
-                    } catch(e) {
-                        console.error('Error parsing response:', e);
-                        alert('Error updating comparison');
-                    }
-                }
+            const formData = new URLSearchParams({
+                db1: getVal(db1),
+                db2: getVal(db2),
+                table1: originalTable,
+                table2: compareWith,
+                selected: compareWith
             });
-        });
+            fetch('ajax/compare_single_table.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            })
+            .then(r => r.json())
+            .then(result => {
+                if (result.error) {
+                    alert(result.error);
+                    return;
+                }
+                const temp = document.createElement('div');
+                temp.innerHTML = result.html;
+                const newRow = temp.firstElementChild;
+                tableRow.parentNode.replaceChild(newRow, tableRow);
+                setVal(qs('.compare-with', newRow), compareWith);
+            })
+            .catch(e => { alert('Error updating comparison'); });
+        }
+    }
 
-        // Handle details button
-        $(document).on('click', '.compare-details', function() {
-            const tableRow = $(this).closest('.table-entry');
-            const table = tableRow.attr('id').replace('table-row-', '');
-            const compareWith = tableRow.find('.compare-with').val();
+    function delegatedClickHandler(e) {
+        if (e.target.matches('.compare-details')) {
+            const tableRow = closest(e.target, '.table-entry');
+            const table = tableRow.id.replace('table-row-', '');
+            const compareWith = qs('.compare-with', tableRow).value;
             alert('Details for ' + table + ' compared with ' + compareWith);
-        });
-
-        // Handle view switching with improved state management
-        $(document).on('click', '.view-summary, .view-details', function(e) {
+        }
+        if (e.target.matches('.view-summary, .view-details')) {
             e.preventDefault();
-            const tableRow = $(this).closest('.table-entry');
-            const table1 = tableRow.data('table');
-            const table2 = tableRow.find('.compare-with').val();
-            const viewType = $(this).hasClass('view-summary') ? 'summary' : 'details';
-            
+            const tableRow = closest(e.target, '.table-entry');
+            const table1 = tableRow.dataset.table;
+            const table2 = qs('.compare-with', tableRow).value;
+            const viewType = e.target.classList.contains('view-summary') ? 'summary' : 'details';
             if (viewType === 'summary') {
-                // For summary view, make a fresh comparison to get proper state
-                $.ajax({
-                    url: 'ajax/compare_single_table.php',
+                const formData = new URLSearchParams({
+                    db1: getVal(db1),
+                    db2: getVal(db2),
+                    table1: table1,
+                    table2: table2,
+                    selected: table2,
+                    force_fresh: true,
+                    view: 'summary'
+                });
+                fetch('ajax/compare_single_table.php', {
                     method: 'POST',
-                    data: {
-                        db1: $('#db1').val(),
-                        db2: $('#db2').val(),
-                        table1: table1,
-                        table2: table2,
-                        selected: table2,
-                        force_fresh: true,
-                        view: 'summary'
-                    },
-                    success: function(response) {
-                        try {
-                            const result = JSON.parse(response);
-                            if (result.html) {
-                                tableRow.replaceWith(result.html);
-                            }
-                        } catch(e) {
-                            console.error('Error:', e);
-                        }
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(result => {
+                    if (result.html) {
+                        const temp = document.createElement('div');
+                        temp.innerHTML = result.html;
+                        const newRow = temp.firstElementChild;
+                        tableRow.parentNode.replaceChild(newRow, tableRow);
                     }
                 });
             } else {
-                // For detailed view, load the detailed comparison
-                $.ajax({
-                    url: 'ajax/get_table_details.php',
+                const formData = new URLSearchParams({
+                    db1: getVal(db1),
+                    db2: getVal(db2),
+                    table1: table1,
+                    table2: table2,
+                    selected: table2
+                });
+                fetch('ajax/get_table_details.php', {
                     method: 'POST',
-                    data: {
-                        db1: $('#db1').val(),
-                        db2: $('#db2').val(),
-                        table1: table1,
-                        table2: table2,
-                        selected: table2
-                    },
-                    success: function(response) {
-                        try {
-                            const result = JSON.parse(response);
-                            if (result.html) {
-                                tableRow.replaceWith(result.html);
-                            }
-                        } catch(e) {
-                            console.error('Error:', e);
-                        }
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(result => {
+                    if (result.html) {
+                        const temp = document.createElement('div');
+                        temp.innerHTML = result.html;
+                        const newRow = temp.firstElementChild;
+                        tableRow.parentNode.replaceChild(newRow, tableRow);
                     }
                 });
             }
-
             // Update dropdown active state
-            tableRow.find('.dropdown-item').removeClass('active');
-            tableRow.find('.view-' + viewType).addClass('active');
-        });
+            qsa('.dropdown-item', tableRow).forEach(item => item.classList.remove('active'));
+            if (viewType === 'summary') {
+                qsa('.view-summary', tableRow).forEach(item => item.classList.add('active'));
+            } else {
+                qsa('.view-details', tableRow).forEach(item => item.classList.add('active'));
+            }
+        }
     }
 
-    $('#db1, #db2').change(function() {
-        loadComparison();
-    });
-
-    if ($('#db1').val() && $('#db2').val()) {
+    db1.addEventListener('change', loadComparison);
+    db2.addEventListener('change', loadComparison);
+    if (getVal(db1) && getVal(db2)) {
         loadComparison();
     }
 });
