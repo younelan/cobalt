@@ -1,5 +1,8 @@
 <?php
 // header.php - Contains the navigation bar for the Database Comparison Tool
+if (!isset($_SESSION['db_credentials'])) {
+    exit;
+}
 ?>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -151,6 +154,18 @@
     .login-form {
       max-width: 400px;
       margin: 0 auto;
+    }
+    .cobalt-menu-bg.collapse.show,
+    .cobalt-menu-bg .navbar-nav.ms-auto.d-lg-none {
+      background: #2563eb !important;
+      word-break: break-word;
+      white-space: normal !important;
+      overflow-wrap: break-word;
+    }
+    .cobalt-menu-bg .nav-link, .cobalt-menu-bg .navbar-text {
+      word-break: break-word;
+      white-space: normal !important;
+      overflow-wrap: break-word;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

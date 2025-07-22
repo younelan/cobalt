@@ -103,3 +103,12 @@ include __DIR__ . '/header.php';
       }
     });
 </script>
+<style>
+@media (max-width: 767.98px) {
+  .detailed-comparison, .table-differences, .diff-summary, .diff-line, .diff-items-wrapper, .diff-item {
+    word-break: break-word;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+  }
+}
+</style>
