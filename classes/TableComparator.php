@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../init.php';
+
 class TableComparator {
     private $db;
     private $db1_name;

@@ -6,13 +6,18 @@ require_once __DIR__ . '/../classes/DBSessionManager.php';
 require_once __DIR__ . '/../classes/TableComparator.php';
 
 if (!isset($_POST['db1']) || !isset($_POST['db2'])) {
-    echo json_encode(['error' => T('Invalid request')]);
+    echo '<div class="alert alert-danger">' . T('Invalid request') . '</div>';
+    exit;
+}
+
+$session = new DBSessionManager();
+$credentials = $session->getCredentials();
+if (!$credentials) {
+    echo '<div class="alert alert-danger">' . T('Not authenticated') . '</div>';
     exit;
 }
 
 try {
-    $session = new DBSessionManager();
-    $credentials = $session->getCredentials();
     $db = new Database($credentials['host'], $credentials['username'], $credentials['password']);
     $comparator = new TableComparator($db, $_POST['db1'], $_POST['db2']);
 
@@ -233,6 +238,5 @@ try {
     echo $output;
 
 } catch (Exception $e) {
-    echo json_encode(['error' => T('Error performing comparison: ') . $e->getMessage()]);
-    exit;
+    echo '<div class="alert alert-danger">' . htmlspecialchars($e->getMessage()) . '</div>';
 }

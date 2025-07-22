@@ -68,4 +68,38 @@ include __DIR__ . '/header.php';
         }
         return translation;
     }
+
+    // Replace any jQuery AJAX with vanilla fetch for table-to-table comparison
+    function updateTableComparison() {
+      var db1 = document.getElementById('db1-select')?.value;
+      var table1 = document.getElementById('table1-select')?.value;
+      var db2 = document.getElementById('db2-select')?.value;
+      var table2 = document.getElementById('table2-select')?.value;
+      var panel = document.getElementById('table-comparison-panel');
+      if (!db1 || !table1 || !db2 || !table2) {
+        panel.innerHTML = '<div class="alert alert-info">Please select both databases and tables to compare.</div>';
+        return;
+      }
+      panel.innerHTML = '<div class="text-center py-4"><div class="spinner-border"></div><div>Loading...</div></div>';
+      fetch('ajax/compare_tables.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'db1=' + encodeURIComponent(db1) + '&table1=' + encodeURIComponent(table1) + '&db2=' + encodeURIComponent(db2) + '&table2=' + encodeURIComponent(table2)
+      })
+      .then(r => r.text())
+      .then(html => {
+        panel.innerHTML = html;
+      })
+      .catch(e => {
+        panel.innerHTML = '<div class="alert alert-danger">Error updating comparison.</div>';
+      });
+    }
+
+    // Attach change listeners to all relevant dropdowns
+    ['db1-select', 'table1-select', 'db2-select', 'table2-select'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', updateTableComparison);
+      }
+    });
 </script>
