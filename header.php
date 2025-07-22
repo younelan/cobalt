@@ -117,10 +117,11 @@
         border-radius: 0.25rem;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container">
-    <a class="navbar-brand" href="welcome.php"><?= T('Database Comparison Tool') ?></a>
+    <a class="navbar-brand" href="welcome.php"><?= T('Database Explorer') ?></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -136,7 +137,7 @@
             <li><a class="dropdown-item" href="tables.php"><?= T('Tables') ?></a></li>
             <?php if (isset($_SESSION['db_credentials'])): ?>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+              <li><a class="dropdown-item" href="logout.php"><?= T('Logout') ?></a></li>
             <?php endif; ?>
           </ul>
         </li>
@@ -149,4 +150,3 @@
     </div>
   </div>
 </nav>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
