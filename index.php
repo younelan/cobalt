@@ -4,6 +4,11 @@ session_start();
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/DBSessionManager.php';
 
+if (isset($_SESSION['db_credentials'])) {
+    header('Location: welcome.php');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['remember_username'])) {
         setcookie('db_username', $_POST['username'], time() + (86400 * 30), "/");
@@ -13,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($db->testConnection()) {
         $session = new DBSessionManager();
         $session->setCredentials($_POST);
-        header('Location: compare.php');
+        header('Location: welcome.php');
         exit;
     }
     $error = T("Connection failed. Please check your credentials.");
