@@ -1,0 +1,29 @@
+{
+    "name": "opensitez/cobalt",
+    "description": "Opensitez Cobalt, a simple database tool",
+    "type": "project",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/younelan/Simplicity"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+        }
+    },
+    "authors": [
+        {
+            "name": "Youness El Andaloussi",
+            "email": "youness@elandaloussi.net"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "opensitez/simplicity": "dev-master",
+        "symfony/mailer": "^7.1",
+        "twig/twig": "^3.14",
+        "league/commonmark": "^2.7"
+    }
+}
