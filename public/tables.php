@@ -1,8 +1,10 @@
 <?php
 session_start();
-require_once __DIR__ . '/init.php';
-require_once __DIR__ . '/classes/Database.php';
-require_once __DIR__ . '/classes/DBSessionManager.php';
+
+$basedir = dirname(__DIR__);
+require_once $basedir . '/init.php';
+require_once $basedir . '/classes/Database.php';
+require_once $basedir . '/classes/DBSessionManager.php';
 
 $session = new DBSessionManager();
 $credentials = $session->getCredentials();
@@ -56,7 +58,7 @@ function renderDbTree($tree, $prefix = '', $fullPath = '') {
     echo '</ul>';
 }
 $tree = buildDbTree($databases);
-include __DIR__ . '/header.php';
+include $basedir . '/header.php';
 ?>
 <div class="container-fluid">
   <div class="row">

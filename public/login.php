@@ -1,8 +1,9 @@
 <?php
-require_once __DIR__ . '/init.php';
+$basedir = dirname(__DIR__);
+require_once $basedir . '/init.php';
 session_start();
-require_once __DIR__ . '/classes/Database.php';
-require_once __DIR__ . '/classes/DBSessionManager.php';
+require_once $basedir . '/classes/Database.php';
+require_once $basedir . '/classes/DBSessionManager.php';
 
 if (isset($_SESSION['db_credentials'])) {
     header('Location: welcome.php');
