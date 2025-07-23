@@ -1,8 +1,10 @@
 <?php
 session_start();
-require_once __DIR__ . '/../init.php';
-require_once __DIR__ . '/../classes/Database.php';
-require_once __DIR__ . '/../classes/DBSessionManager.php';
+
+$basedir = dirname(dirname(__DIR__));
+require_once $basedir . '/init.php';
+require_once $basedir . '/classes/Database.php';
+require_once $basedir . '/classes/DBSessionManager.php';
 
 if (!isset($_POST['db'])) {
     echo json_encode(['error' => 'Invalid request']);

@@ -1,8 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../classes/Database.php';
-require_once __DIR__ . '/../classes/DBSessionManager.php';
-require_once __DIR__ . '/../classes/TableComparator.php';
+$basedir = dirname(dirname(__DIR__));
+require_once $basedir . '/classes/Database.php';
+require_once $basedir . '/classes/DBSessionManager.php';
+require_once $basedir . '/classes/TableComparator.php';
 
 if (!isset($_POST['db1']) || !isset($_POST['db2']) || !isset($_POST['table1']) || !isset($_POST['table2'])) {
     echo json_encode(['error' => 'Invalid request']);
