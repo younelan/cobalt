@@ -1,0 +1,9 @@
+RedirectMatch 404 /data
+RedirectMatch 404 /config
+RedirectMatch 404 /classes
+RedirectMatch 404 /templates
+RedirectMatch 404 /vendor
+RedirectMatch 404 /\.git
+RedirectMatch 404 /composer.*
+RedirectMatch 404 /\.gitmodules
+
