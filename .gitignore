@@ -1,0 +1,10 @@
+local
+vendor
+private
+*.tmp
+*sql
+old*
+tmp
+temp
+doc
+.DS_Store
